@@ -1,0 +1,61 @@
+Product Requirements Document: Simple Task Management API
+
+## Overview
+Build a RESTful API for a simple task management system. Users can create, read,
+update, and delete tasks. Each task has a title, description, status, and priority.
+
+## Goals
+- Provide a clean REST API for managing tasks
+- Support filtering tasks by status and priority
+- Persist tasks using an in-memory H2 database
+- Return meaningful error messages for invalid requests
+
+## Functional Requirements
+
+### Task Entity
+Each task must have:
+- id (auto-generated, long)
+- title (required, max 200 chars)
+- description (optional, max 2000 chars)
+- status: TODO | IN_PROGRESS | DONE (default: TODO)
+- priority: LOW | MEDIUM | HIGH (default: MEDIUM)
+- createdAt (auto-set on creation)
+- updatedAt (auto-set on every update)
+
+### API Endpoints
+1. POST /api/tasks — Create a new task
+   - Request: { title, description?, status?, priority? }
+   - Response: 201 Created with the created task
+   - Validation: title is required; status/priority must be valid enum values
+
+2. GET /api/tasks — List all tasks
+   - Optional query params: ?status=TODO&priority=HIGH
+   - Response: 200 OK with array of tasks
+
+3. GET /api/tasks/{id} — Get a single task
+   - Response: 200 OK with task, or 404 if not found
+
+4. PUT /api/tasks/{id} — Update a task
+   - Request: { title?, description?, status?, priority? }
+   - Response: 200 OK with updated task, or 404 if not found
+
+5. DELETE /api/tasks/{id} — Delete a task
+   - Response: 204 No Content, or 404 if not found
+
+### Error Handling
+- 400 Bad Request with { error, message } for validation failures
+- 404 Not Found with { error, message } for missing resources
+- 500 Internal Server Error for unexpected failures
+
+## Non-Functional Requirements
+- Spring Boot 3.x, Java 21
+- Maven build
+- H2 in-memory database (no external DB required)
+- Application runs on port 8080
+- API response time < 200ms for all endpoints
+
+## Out of Scope
+- Authentication / authorization
+- Pagination
+- Task assignments to users
+- File attachments
