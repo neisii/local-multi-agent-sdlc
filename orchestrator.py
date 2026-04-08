@@ -9,6 +9,7 @@ from agents import (
     ReviewerAgent,
     FixerAgent,
 )
+from agents.base import TokenLedger
 
 MAX_ITERATIONS = 3
 
@@ -16,11 +17,15 @@ MAX_ITERATIONS = 3
 class Orchestrator:
     def __init__(self, max_iterations: int = MAX_ITERATIONS) -> None:
         self.max_iterations = max_iterations
-        self.planner = PlannerAgent()
-        self.architect = ArchitectAgent()
-        self.builder = BuilderAgent()
-        self.reviewer = ReviewerAgent()
-        self.fixer = FixerAgent()
+        self.ledger = TokenLedger()
+        self.planner   = PlannerAgent(ledger=self.ledger)
+        self.architect = ArchitectAgent(ledger=self.ledger)
+        self.builder   = BuilderAgent(ledger=self.ledger)
+        self.reviewer  = ReviewerAgent(ledger=self.ledger)
+        self.fixer     = FixerAgent(ledger=self.ledger)
+
+    def cost_report(self) -> str:
+        return self.ledger.report()
 
     def run(self, prd: str) -> SDLCState:
         state = SDLCState(prd=prd)

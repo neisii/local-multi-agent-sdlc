@@ -26,4 +26,5 @@ class ArchitectAgent(BaseAgent):
                 "Produce the system design document."
             ),
             system_prompt=SYSTEM,
+            agent_name="architect",
         )

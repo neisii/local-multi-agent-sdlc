@@ -22,4 +22,5 @@ class PlannerAgent(BaseAgent):
         state.spec = self._run(
             prompt=f"## PRD\n\n{state.prd}\n\nProduce the structured specification.",
             system_prompt=SYSTEM,
+            agent_name="planner",
         )

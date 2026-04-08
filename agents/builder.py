@@ -36,6 +36,7 @@ class BuilderAgent(BaseAgent):
             cwd=code_dir,
             system_prompt=SYSTEM,
             permission_mode="acceptEdits",
+            agent_name="builder",
         )
 
         state.code = _read_code_tree(code_dir)

@@ -40,6 +40,7 @@ class ReviewerAgent(BaseAgent):
             tools=["Read", "Glob", "Grep"],
             cwd=code_dir,
             system_prompt=SYSTEM,
+            agent_name="reviewer",
         )
         passed = audit.strip().startswith("VERDICT: PASS")
         state.audit = audit

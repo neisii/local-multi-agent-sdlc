@@ -55,6 +55,9 @@ def main() -> None:
     print(f"  State        : state.json")
     print(f"  Time         : {elapsed:.1f}s")
     print("=" * 60)
+    print("\n── Token & Cost Report ──────────────────────────────────────")
+    print(orchestrator.cost_report())
+    print("─" * 60)
 
 
 if __name__ == "__main__":

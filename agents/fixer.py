@@ -31,5 +31,6 @@ class FixerAgent(BaseAgent):
             cwd=code_dir,
             system_prompt=SYSTEM,
             permission_mode="acceptEdits",
+            agent_name="fixer",
         )
         state.code = _read_code_tree(code_dir)
