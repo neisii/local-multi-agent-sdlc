@@ -189,6 +189,25 @@ claude --print \
 
 The prompt is piped via stdin. The output is parsed as JSONL events; the line with `"type": "result"` contains the agent's final response.
 
+## v1 vs v2
+
+| | v1 | v2 |
+|---|---|---|
+| **Run command** | `python3 main.py <prd> [n]` | `python3 v2/main.py <prd> [n]` |
+| **Output directory** | `output/` | `v2_output/` |
+| **Token usage** | High — full documents sent to every agent | 70–90% lower — only compressed summaries sent |
+| **State design** | Single flat `SDLCState` | Three tiers: RAW / COMPRESSED / PATCH |
+| **Memory compression** | None | Compressor agent reduces PRD/spec/arch to ~200–300 token summaries |
+| **Model usage** | Opus for all agents | Sonnet for planning/routing/review; Opus only for code generation |
+| **Code generation** | Single Builder call for the entire codebase | Router maps requirements to files; Builder generates one file per Opus call |
+| **Review** | Single Reviewer sees full codebase | Stage 1 (Sonnet, per-file) → Stage 2 (Opus, flagged files only) |
+| **Fixing** | Full file content re-sent to Fixer | Fixer receives only issue list + file paths; uses Read/Edit tools surgically |
+| **Cost visibility** | None | Per-agent token ledger + estimated USD cost printed at end |
+| **Best for** | Simple PRDs, quick experiments | Complex PRDs, cost-sensitive runs, production use |
+
+**Choose v1** if you want simplicity and don't mind higher token usage.  
+**Choose v2** if you have a large PRD, want lower cost, or need to understand where tokens are spent.
+
 ## Tips
 
 - **Longer PRDs produce better code.** Include specific field names, enum values, HTTP status codes, and error message formats.
