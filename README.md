@@ -153,24 +153,53 @@ The app starts on `http://localhost:8080` by default.
   State        : state.json
   Time         : 94.3s
 ============================================================
+
+── Token & Cost Report ──────────────────────────────────────
+Agent                        In      Out
+------------------------------------------
+planner                   1,066      533
+architect                 1,600      800
+builder                   6,666    2,666
+reviewer                  4,000      666
+==========================================
+TOTAL                    13,332    4,665
+ALL TOKENS               17,997
+
+  Model         : claude-opus-4-6
+  Estimated cost: $0.6832
+────────────────────────────────────────────────────────────
 ```
 
 ## Project Structure
 
 ```
 local-multi-agent-sdlc/
-├── main.py              # CLI entry point
-├── orchestrator.py      # Execution flow + review/fix loop
-├── state.py             # Shared SDLCState dataclass
+├── main.py              # v1 CLI entry point
+├── orchestrator.py      # v1 execution flow + review/fix loop
+├── state.py             # v1 shared SDLCState dataclass
 ├── requirements.txt
 ├── example_prd.txt      # Sample PRD (task management REST API)
-└── agents/
-    ├── base.py          # BaseAgent — subprocess wrapper for claude --print
-    ├── planner.py
-    ├── architect.py
-    ├── builder.py
-    ├── reviewer.py
-    └── fixer.py
+├── agents/              # v1 agents (all Opus)
+│   ├── base.py          # BaseAgent + TokenLedger
+│   ├── planner.py
+│   ├── architect.py
+│   ├── builder.py
+│   ├── reviewer.py
+│   └── fixer.py
+└── v2/                  # v2 context-optimized pipeline
+    ├── main.py          # v2 CLI entry point
+    ├── orchestrator.py  # 7-step pipeline with compression loop
+    ├── state.py         # RAW / COMPRESSED / PATCH state tiers
+    ├── context_budget.py# Token budgets, TokenLedger, model constants
+    └── agents/          # v2 agents (Sonnet + Opus tiers)
+        ├── base.py
+        ├── compressor.py
+        ├── planner.py
+        ├── architect.py
+        ├── router.py
+        ├── builder.py
+        ├── reviewer.py
+        └── fixer.py
 ```
 
 ## How the Claude CLI Integration Works
@@ -202,7 +231,7 @@ The prompt is piped via stdin. The output is parsed as JSONL events; the line wi
 | **Code generation** | Single Builder call for the entire codebase | Router maps requirements to files; Builder generates one file per Opus call |
 | **Review** | Single Reviewer sees full codebase | Stage 1 (Sonnet, per-file) → Stage 2 (Opus, flagged files only) |
 | **Fixing** | Full file content re-sent to Fixer | Fixer receives only issue list + file paths; uses Read/Edit tools surgically |
-| **Cost visibility** | None | Per-agent token ledger + estimated USD cost printed at end |
+| **Cost visibility** | Per-agent token ledger + estimated USD cost printed at end | Per-agent token ledger with Sonnet/Opus split + estimated USD cost |
 | **Best for** | Simple PRDs, quick experiments | Complex PRDs, cost-sensitive runs, production use |
 
 **Choose v1** if you want simplicity and don't mind higher token usage.  
