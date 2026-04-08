@@ -105,6 +105,10 @@ class TokenLedger:
                 total_opus_in  += in_tok
                 total_opus_out += out_tok
 
+        total_in    = total_sonnet_in  + total_opus_in
+        total_out   = total_sonnet_out + total_opus_out
+        total_all   = total_in + total_out
+
         sonnet_cost = (total_sonnet_in * 3.0 + total_sonnet_out * 15.0) / 1_000_000
         opus_cost   = (total_opus_in  * 25.0 + total_opus_out  * 75.0)  / 1_000_000
         total_cost  = sonnet_cost + opus_cost
@@ -113,6 +117,9 @@ class TokenLedger:
             "-" * 52,
             f"{'Sonnet total':<22} {'':10} {total_sonnet_in:>7,} {total_sonnet_out:>7,}",
             f"{'Opus total':<22} {'':10} {total_opus_in:>7,} {total_opus_out:>7,}",
+            "=" * 52,
+            f"{'TOTAL':<22} {'':10} {total_in:>7,} {total_out:>7,}",
+            f"{'ALL TOKENS':<22} {'':10} {total_all:>7,}",
             "",
             f"  Estimated cost: Sonnet ${sonnet_cost:.4f} + Opus ${opus_cost:.4f}"
             f" = ${total_cost:.4f}",
